@@ -1,6 +1,11 @@
-## Delta Chat Android Client
+## Delta Chat Android Client — Yggdrasil Fork
 
-This is the Android client for [Delta Chat](https://delta.chat/).
+This is a **thin fork** of the [Delta Chat](https://delta.chat/) Android client with embedded **Yggdrasil** peer-to-peer IPv6 mesh network support via [yggstack](https://github.com/DrewCyber/yggstack/tree/mobile-bindings-ai).
+
+Features added:
+- Embedded Yggdrasil node (auto-starts on app boot)
+- Settings UI for connection status, peer management, and port forwarding
+- Instant account login with Yggdrasil access from the overflow menu
 
 [<img src="https://delta.chat/assets/badges/get-it-on-gplay.png" alt="Get it on Google Play" height="48">](https://play.google.com/store/apps/details?id=chat.delta)
 [<img src="https://delta.chat/assets/badges/get-it-on-fdroid.png" alt="Get it on F-Droid" height="48">](https://f-droid.org/app/com.b44t.messenger)

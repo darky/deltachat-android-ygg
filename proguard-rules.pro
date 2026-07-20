@@ -14,6 +14,9 @@
 
 -dontwarn com.google.firebase.analytics.connector.AnalyticsConnector
 
+# Keep yggstack (gomobile bindings) classes
+-keep class link.yggdrasil.yggstack.** { *; }
+
 # Keep WebRTC classes
 -keep class org.webrtc.** { *; }
 -keepclassmembers class org.webrtc.** { *; }

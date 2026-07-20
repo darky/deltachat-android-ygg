@@ -376,12 +376,20 @@ public class EditRelayActivity extends BaseActionBarActivity
   private void verifyServer(TextInputEditText view) {
     String error = getString(R.string.login_error_server);
     String server = view.getText().toString();
-    if (!TextUtils.isEmpty(server)
-        && !Patterns.DOMAIN_NAME.matcher(server).matches()
-        && !Patterns.IP_ADDRESS.matcher(server).matches()
-        && !Patterns.WEB_URL.matcher(server).matches()
-        && !"localhost".equals(server)) {
-      view.setError(error);
+    if (TextUtils.isEmpty(server)) return;
+    if (Patterns.DOMAIN_NAME.matcher(server).matches()) return;
+    if (Patterns.IP_ADDRESS.matcher(server).matches()) return;
+    if (Patterns.WEB_URL.matcher(server).matches()) return;
+    if ("localhost".equals(server)) return;
+    if (isValidIpv6(server)) return;
+    view.setError(error);
+  }
+
+  private static boolean isValidIpv6(String s) {
+    try {
+      return java.net.InetAddress.getByName(s) instanceof java.net.Inet6Address;
+    } catch (Exception e) {
+      return false;
     }
   }
 

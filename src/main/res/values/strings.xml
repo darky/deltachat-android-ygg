@@ -1253,4 +1253,31 @@
 
     <!-- device messages for updates -->
     <string name="update_2_0">What\'s new?\n\n💯 End-to-end encryption is reliable and forever now. Padlocks 🔒 are gone!\n\n✉️ Classic email without end-to-end encryption is marked with a letter symbol\n\n😻 New enhanced profile screen for all your contacts\n\n🔲 New button for quick access to apps used in a chat\n\n❤️ Please donate to help us remain independent and continue to bring improvements: %1$s</string>
+
+    <!-- Yggdrasil -->
+    <string name="yggdrasil">Yggdrasil</string>
+    <string name="yggdrasil_status">Status</string>
+    <string name="yggdrasil_status_unknown">Unknown</string>
+    <string name="yggdrasil_status_running">Running</string>
+    <string name="yggdrasil_status_stopped">Stopped</string>
+    <string name="yggdrasil_start">Start Yggdrasil</string>
+    <string name="yggdrasil_stop">Stop Yggdrasil</string>
+    <string name="yggdrasil_ipv6_label">IPv6: %1$s</string>
+    <string name="yggdrasil_pubkey_label">Public Key: %1$s</string>
+    <string name="yggdrasil_peers">Peers</string>
+    <string name="yggdrasil_peers_count">Peers: %1$d</string>
+    <string name="yggdrasil_peers_header">Configured peers (%1$d)</string>
+    <string name="yggdrasil_add_peer">Add Peer</string>
+    <string name="yggdrasil_add_peer_explain">Enter the peer URI (e.g. tls://host:port)</string>
+    <string name="yggdrasil_remove_peer">Remove Peer</string>
+    <string name="yggdrasil_remove_peer_explain">Remove peer: %1$s?</string>
+    <string name="yggdrasil_port_forwarding">Port Forwarding</string>
+    <string name="yggdrasil_pf_header">Active mappings (%1$d)</string>
+    <string name="yggdrasil_add_pf">Add Mapping</string>
+    <string name="yggdrasil_add_pf_explain">Expose a local port on the Yggdrasil network</string>
+    <string name="yggdrasil_remove_pf">Remove Mapping</string>
+    <string name="yggdrasil_remove_pf_explain">Remove mapping: %1$s?</string>
+    <string name="yggdrasil_pf_remote_port_hint">Remote Port (on Yggdrasil)</string>
+    <string name="yggdrasil_pf_remote_host_hint">Remote Host (Yggdrasil IPv6)</string>
+    <string name="yggdrasil_pf_local_port_hint">Local Port (on this device)</string>
 </resources>

@@ -43,6 +43,7 @@ import java.util.concurrent.Executors;
 import org.thoughtcrime.securesms.components.AvatarSelector;
 import org.thoughtcrime.securesms.connect.DcEventCenter;
 import org.thoughtcrime.securesms.connect.DcHelper;
+import org.thoughtcrime.securesms.yggdrasil.YggdrasilSettingsActivity;
 import org.thoughtcrime.securesms.contacts.avatars.ResourceContactPhoto;
 import org.thoughtcrime.securesms.mms.AttachmentManager;
 import org.thoughtcrime.securesms.mms.GlideApp;
@@ -168,6 +169,9 @@ public class InstantOnboardingActivity extends BaseActionBarActivity
       return true;
     } else if (itemId == R.id.menu_proxy_settings) {
       startActivity(new Intent(this, ProxySettingsActivity.class));
+      return true;
+    } else if (itemId == R.id.menu_yggdrasil_settings) {
+      startActivity(new Intent(this, YggdrasilSettingsActivity.class));
       return true;
     } else if (itemId == R.id.menu_view_log) {
       startActivity(new Intent(this, LogViewActivity.class));

@@ -34,6 +34,7 @@ import org.thoughtcrime.securesms.StatsSending;
 import org.thoughtcrime.securesms.connect.DcEventCenter;
 import org.thoughtcrime.securesms.proxy.ProxySettingsActivity;
 import org.thoughtcrime.securesms.relay.RelayListActivity;
+import org.thoughtcrime.securesms.yggdrasil.YggdrasilSettingsActivity;
 import org.thoughtcrime.securesms.util.Prefs;
 import org.thoughtcrime.securesms.util.ScreenLockUtil;
 import org.thoughtcrime.securesms.util.StreamUtil;
@@ -160,6 +161,15 @@ public class AdvancedPreferenceFragment extends ListSummaryPreferenceFragment
             }
             return true;
           }));
+    }
+
+    Preference yggdrasilSettings = this.findPreference("yggdrasil_settings");
+    if (yggdrasilSettings != null) {
+      yggdrasilSettings.setOnPreferenceClickListener(
+          (preference) -> {
+            startActivity(new Intent(requireActivity(), YggdrasilSettingsActivity.class));
+            return true;
+          });
     }
   }
 

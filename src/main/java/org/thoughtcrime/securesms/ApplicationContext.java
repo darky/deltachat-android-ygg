@@ -48,6 +48,7 @@ import org.thoughtcrime.securesms.util.Prefs;
 import org.thoughtcrime.securesms.util.SignalProtocolLoggerProvider;
 import org.thoughtcrime.securesms.util.Util;
 import org.thoughtcrime.securesms.webxdc.WebxdcGarbageCollectionWorker;
+import org.thoughtcrime.securesms.yggdrasil.YggdrasilManager;
 
 public class ApplicationContext extends MultiDexApplication {
   private static final String TAG = "ApplicationContext";
@@ -248,6 +249,9 @@ public class ApplicationContext extends MultiDexApplication {
               DcHelper.setStockTranslations(this);
 
               dcAccounts.startIo();
+
+              YggdrasilManager.init(ApplicationContext.this);
+              YggdrasilManager.start();
             } catch (Exception e) {
               Log.e(TAG, "Fatal error during DcAccounts initialization", e);
               // Mark as initialized even on error to avoid deadlock
@@ -271,15 +275,16 @@ public class ApplicationContext extends MultiDexApplication {
       connectivityManager.registerDefaultNetworkCallback(
           new ConnectivityManager.NetworkCallback() {
             @Override
-            public void onAvailable(@NonNull android.net.Network network) {
-              Log.i(
-                  "DeltaChat",
-                  "++++++++++++++++++ NetworkCallback.onAvailable() #" + debugOnAvailableCount++);
-              // onBlockedStatusChanged is only available on API 29+
-              if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                getDcAccounts().maybeNetwork();
+              public void onAvailable(@NonNull android.net.Network network) {
+                Log.i(
+                    "DeltaChat",
+                    "++++++++++++++++++ NetworkCallback.onAvailable() #" + debugOnAvailableCount++);
+                // onBlockedStatusChanged is only available on API 29+
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                  getDcAccounts().maybeNetwork();
+                }
+                YggdrasilManager.retryPeersAndReapplyMappings();
               }
-            }
 
             @Override
             public void onBlockedStatusChanged(
@@ -292,6 +297,7 @@ public class ApplicationContext extends MultiDexApplication {
                       + debugOnBlockedStatusChangedCount++);
               if (!blocked) {
                 getDcAccounts().maybeNetwork();
+                YggdrasilManager.retryPeersAndReapplyMappings();
               }
             }
 

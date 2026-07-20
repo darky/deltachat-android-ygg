@@ -465,6 +465,18 @@
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize">
         </activity>
 
+        <activity
+            android:name=".yggdrasil.YggdrasilSettingsActivity"
+            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize" />
+
+        <activity
+            android:name=".yggdrasil.YggdrasilPeersActivity"
+            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize" />
+
+        <activity
+            android:name=".yggdrasil.YggdrasilPortForwardingActivity"
+            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize" />
+
         <service
             android:name=".service.GenericForegroundService"
             android:foregroundServiceType="dataSync" />
