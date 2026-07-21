@@ -48,6 +48,7 @@ import org.thoughtcrime.securesms.util.Prefs;
 import org.thoughtcrime.securesms.util.SignalProtocolLoggerProvider;
 import org.thoughtcrime.securesms.util.Util;
 import org.thoughtcrime.securesms.webxdc.WebxdcGarbageCollectionWorker;
+import org.thoughtcrime.securesms.yggdrasil.YggdrasilForegroundService;
 import org.thoughtcrime.securesms.yggdrasil.YggdrasilManager;
 
 public class ApplicationContext extends MultiDexApplication {
@@ -250,8 +251,7 @@ public class ApplicationContext extends MultiDexApplication {
 
               dcAccounts.startIo();
 
-              YggdrasilManager.init(ApplicationContext.this);
-              YggdrasilManager.start();
+              YggdrasilForegroundService.startSelf(ApplicationContext.this);
             } catch (Exception e) {
               Log.e(TAG, "Fatal error during DcAccounts initialization", e);
               // Mark as initialized even on error to avoid deadlock

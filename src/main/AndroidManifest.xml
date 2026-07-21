@@ -75,6 +75,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
 
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+
     <!-- force compiling libs on older sdk than supported; runtime checks are required -->
     <uses-sdk tools:overrideLibrary="androidx.core.telecom,im.conversations.webrtc" />
 
@@ -476,6 +478,11 @@
         <activity
             android:name=".yggdrasil.YggdrasilPortForwardingActivity"
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize" />
+
+        <service
+            android:name=".yggdrasil.YggdrasilForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
         <service
             android:name=".service.GenericForegroundService"

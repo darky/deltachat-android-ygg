@@ -1280,4 +1280,7 @@
     <string name="yggdrasil_pf_remote_port_hint">Remote Port (on Yggdrasil)</string>
     <string name="yggdrasil_pf_remote_host_hint">Remote Host (Yggdrasil IPv6)</string>
     <string name="yggdrasil_pf_local_port_hint">Local Port (on this device)</string>
+    <string name="yggdrasil_notification_text">Yggdrasil mesh networking active</string>
+    <string name="yggdrasil_notification_channel_name">Yggdrasil Network</string>
+    <string name="yggdrasil_notification_channel_desc">Yggdrasil mesh networking service</string>
 </resources>

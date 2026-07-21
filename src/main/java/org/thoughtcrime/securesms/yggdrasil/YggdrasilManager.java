@@ -93,6 +93,10 @@ public class YggdrasilManager {
   }
 
   public static synchronized void init(Context context) {
+    if (instance != null) {
+      Log.w(TAG, "init: already initialized, skipping");
+      return;
+    }
     appContext = context.getApplicationContext();
     instance = Mobile.newYggstack();
     instance.setLogLevel("info");
@@ -163,6 +167,10 @@ public class YggdrasilManager {
 
   public static synchronized void start() {
     if (running) return;
+    if (instance == null) {
+      Log.e(TAG, "start: instance is null, cannot start");
+      return;
+    }
     try {
       instance.start("", "");
       running = true;
@@ -177,11 +185,14 @@ public class YggdrasilManager {
   public static synchronized void stop() {
     if (!running) return;
     try {
-      instance.stop();
+      if (instance != null) {
+        instance.stop();
+      }
     } catch (Exception e) {
       Log.e(TAG, "Error stopping Yggdrasil", e);
     }
     running = false;
+    instance = null;
     Log.i(TAG, "Yggdrasil stopped");
     notifyStatusChanged();
   }

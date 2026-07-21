@@ -41,9 +41,9 @@ public class YggdrasilSettingsActivity extends BaseActionBarActivity {
     toggleBtn.setOnClickListener(
         v -> {
           if (YggdrasilManager.isRunning()) {
-            YggdrasilManager.stop();
+            YggdrasilForegroundService.stopSelf(this);
           } else {
-            YggdrasilManager.start();
+            YggdrasilForegroundService.startSelf(this);
           }
           updateUi();
         });
