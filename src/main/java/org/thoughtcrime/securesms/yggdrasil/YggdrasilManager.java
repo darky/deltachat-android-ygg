@@ -118,6 +118,9 @@ public class YggdrasilManager {
 
     try {
       configJson = Mobile.generateConfig();
+      JSONObject cfg = new JSONObject(configJson);
+      cfg.put("MulticastInterfaces", new JSONArray());
+      configJson = cfg.toString();
     } catch (Exception e) {
       Log.e(TAG, "Failed to generate config, using empty", e);
       configJson = "{}";

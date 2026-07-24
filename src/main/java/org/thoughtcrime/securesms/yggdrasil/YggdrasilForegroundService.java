@@ -31,7 +31,6 @@ public class YggdrasilForegroundService extends Service {
 
   private PowerManager.WakeLock wakeLock;
   private WifiManager.WifiLock wifiLock;
-  private WifiManager.MulticastLock multicastLock;
 
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -117,13 +116,11 @@ public class YggdrasilForegroundService extends Service {
   private void acquireLocks() {
     acquireWakeLock();
     acquireWifiLock();
-    acquireMulticastLock();
   }
 
   private void releaseLocks() {
     releaseWakeLock();
     releaseWifiLock();
-    releaseMulticastLock();
   }
 
   private void acquireWakeLock() {
@@ -176,31 +173,7 @@ public class YggdrasilForegroundService extends Service {
     wifiLock = null;
   }
 
-  private void acquireMulticastLock() {
-    if (multicastLock != null && multicastLock.isHeld()) return;
-    try {
-      WifiManager wm = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-      if (wm != null) {
-        multicastLock = wm.createMulticastLock("yggdrasil:multicast");
-        multicastLock.acquire();
-        Log.i(TAG, "MulticastLock acquired");
-      }
-    } catch (Exception e) {
-      Log.e(TAG, "Failed to acquire MulticastLock", e);
-    }
-  }
 
-  private void releaseMulticastLock() {
-    try {
-      if (multicastLock != null && multicastLock.isHeld()) {
-        multicastLock.release();
-        Log.i(TAG, "MulticastLock released");
-      }
-    } catch (Exception e) {
-      Log.e(TAG, "Error releasing MulticastLock", e);
-    }
-    multicastLock = null;
-  }
 
   private void ensureRunning() {
     if (!YggdrasilManager.isRunning()) {
