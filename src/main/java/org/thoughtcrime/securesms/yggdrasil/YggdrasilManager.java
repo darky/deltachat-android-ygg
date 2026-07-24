@@ -23,7 +23,7 @@ public class YggdrasilManager {
   private static final String KEY_MAPPINGS = "mappings";
 
   private static final String[] DEFAULT_PEERS = {
-    "tls://45.95.202.21:443",
+    "tls://37.192.232.33:442",
     "tls://45.147.200.202:443",
     "tls://95.217.35.92:1337",
     "tls://62.210.85.80:39575"
