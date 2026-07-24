@@ -152,7 +152,7 @@ public class YggdrasilForegroundService extends Service {
     try {
       WifiManager wm = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
       if (wm != null) {
-        wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "yggdrasil:wifi");
+        wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL, "yggdrasil:wifi");
         wifiLock.acquire();
         Log.i(TAG, "WifiLock acquired");
       }
