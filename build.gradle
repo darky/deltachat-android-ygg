@@ -227,6 +227,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1' // used as JSON library
     implementation 'com.github.Baseflow:PhotoView:2.3.0' // does the zooming on photos / media
     implementation 'com.caverock:androidsvg-aar:1.4' // SVG support.
+    implementation 'org.mindrot:jbcrypt:0.4'
     implementation 'com.github.bumptech.glide:glide:4.16.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
     annotationProcessor 'androidx.annotation:annotation:1.9.1'

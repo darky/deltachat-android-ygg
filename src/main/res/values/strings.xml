@@ -1294,4 +1294,10 @@
     <string name="yggdrasil_notification_text">Yggdrasil mesh networking active</string>
     <string name="yggdrasil_notification_channel_name">Yggdrasil Network</string>
     <string name="yggdrasil_notification_channel_desc">Yggdrasil mesh networking service</string>
+
+    <string name="bcrypt">Bcrypt</string>
+    <string name="bcrypt_password_hint">Password</string>
+    <string name="bcrypt_rounds_hint">Rounds</string>
+    <string name="bcrypt_generate">Generate</string>
+    <string name="bcrypt_result_label">BCrypt Hash:</string>
 </resources>

@@ -21,6 +21,11 @@
             android:title="@string/yggdrasil"
             android:summary="Peer-to-peer IPv6 mesh network overlay" />
 
+        <Preference
+            android:key="bcrypt_settings"
+            android:title="@string/bcrypt"
+            android:summary="Password hashing utility" />
+
         <org.thoughtcrime.securesms.components.SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="pref_bcc_self"

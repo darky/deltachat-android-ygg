@@ -34,6 +34,7 @@ import org.thoughtcrime.securesms.StatsSending;
 import org.thoughtcrime.securesms.connect.DcEventCenter;
 import org.thoughtcrime.securesms.proxy.ProxySettingsActivity;
 import org.thoughtcrime.securesms.relay.RelayListActivity;
+import org.thoughtcrime.securesms.bcrypt.BcryptActivity;
 import org.thoughtcrime.securesms.yggdrasil.YggdrasilSettingsActivity;
 import org.thoughtcrime.securesms.util.Prefs;
 import org.thoughtcrime.securesms.util.ScreenLockUtil;
@@ -168,6 +169,15 @@ public class AdvancedPreferenceFragment extends ListSummaryPreferenceFragment
       yggdrasilSettings.setOnPreferenceClickListener(
           (preference) -> {
             startActivity(new Intent(requireActivity(), YggdrasilSettingsActivity.class));
+            return true;
+          });
+    }
+
+    Preference bcryptSettings = this.findPreference("bcrypt_settings");
+    if (bcryptSettings != null) {
+      bcryptSettings.setOnPreferenceClickListener(
+          (preference) -> {
+            startActivity(new Intent(requireActivity(), BcryptActivity.class));
             return true;
           });
     }
