@@ -5,10 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
@@ -18,13 +17,14 @@ import org.json.JSONArray;
 import org.thoughtcrime.securesms.BaseActionBarActivity;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.util.Util;
+import org.thoughtcrime.securesms.util.ViewUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class YggdrasilPeersActivity extends BaseActionBarActivity {
 
-  private ArrayAdapter<String> adapter;
+  private LinearLayout listContainer;
   private TextView headerText;
 
   public static Intent createIntent(Context context) {
@@ -36,6 +36,8 @@ public class YggdrasilPeersActivity extends BaseActionBarActivity {
     super.onCreate(bundle);
     setContentView(R.layout.yggdrasil_peers_activity);
 
+    ViewUtil.applyWindowInsets(findViewById(R.id.content_container), true, true, true, true);
+
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {
       actionBar.setTitle(R.string.yggdrasil_peers);
@@ -43,18 +45,8 @@ public class YggdrasilPeersActivity extends BaseActionBarActivity {
     }
 
     headerText = findViewById(R.id.yggdrasil_peers_header);
-    ListView listView = findViewById(R.id.yggdrasil_peers_list);
+    listContainer = findViewById(R.id.yggdrasil_peers_list);
     Button addBtn = findViewById(R.id.yggdrasil_add_peer);
-
-    adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
-    listView.setAdapter(adapter);
-
-    listView.setOnItemLongClickListener(
-        (parent, view, position, id) -> {
-          String peer = adapter.getItem(position);
-          if (peer != null) showDeleteDialog(peer);
-          return true;
-        });
 
     addBtn.setOnClickListener(v -> showAddDialog());
     loadPeers();
@@ -75,11 +67,26 @@ public class YggdrasilPeersActivity extends BaseActionBarActivity {
           List<String> peers = getPeersList();
           Util.runOnMain(
               () -> {
-                adapter.clear();
-                adapter.addAll(peers);
+                listContainer.removeAllViews();
                 headerText.setText(getString(R.string.yggdrasil_peers_header, peers.size()));
+                for (String peer : peers) {
+                  addPeerView(peer);
+                }
               });
         });
+  }
+
+  private void addPeerView(String peer) {
+    TextView tv = new TextView(this);
+    tv.setText(peer);
+    tv.setPadding(0, 12, 0, 12);
+    tv.setTextSize(16);
+    tv.setOnLongClickListener(
+        v -> {
+          showDeleteDialog(peer);
+          return true;
+        });
+    listContainer.addView(tv);
   }
 
   private List<String> getPeersList() {

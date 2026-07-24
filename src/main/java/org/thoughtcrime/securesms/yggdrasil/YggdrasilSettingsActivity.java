@@ -9,6 +9,7 @@ import androidx.appcompat.app.ActionBar;
 
 import org.thoughtcrime.securesms.BaseActionBarActivity;
 import org.thoughtcrime.securesms.R;
+import org.thoughtcrime.securesms.util.ViewUtil;
 
 public class YggdrasilSettingsActivity extends BaseActionBarActivity {
 
@@ -23,6 +24,8 @@ public class YggdrasilSettingsActivity extends BaseActionBarActivity {
   public void onCreate(Bundle bundle) {
     super.onCreate(bundle);
     setContentView(R.layout.yggdrasil_settings_activity);
+
+    ViewUtil.applyWindowInsets(findViewById(R.id.content_container), true, true, true, true);
 
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {

@@ -10,6 +10,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import org.mindrot.jbcrypt.BCrypt;
 import org.thoughtcrime.securesms.BaseActionBarActivity;
 import org.thoughtcrime.securesms.R;
+import org.thoughtcrime.securesms.util.ViewUtil;
 
 public class BcryptActivity extends BaseActionBarActivity {
 
@@ -22,6 +23,8 @@ public class BcryptActivity extends BaseActionBarActivity {
   public void onCreate(Bundle bundle) {
     super.onCreate(bundle);
     setContentView(R.layout.bcrypt_activity);
+
+    ViewUtil.applyWindowInsets(findViewById(R.id.content_container), true, true, true, true);
 
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {

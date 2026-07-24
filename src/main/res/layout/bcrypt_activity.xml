@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/content_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -13,12 +15,13 @@
             android:id="@+id/bcrypt_password_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/bcrypt_password_hint">
+            app:boxBackgroundMode="outline">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/bcrypt_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="@string/bcrypt_password_hint"
                 android:inputType="textPassword" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -28,12 +31,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="@string/bcrypt_rounds_hint">
+            app:boxBackgroundMode="outline">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/bcrypt_rounds"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="@string/bcrypt_rounds_hint"
                 android:inputType="number"
                 android:text="14" />
 

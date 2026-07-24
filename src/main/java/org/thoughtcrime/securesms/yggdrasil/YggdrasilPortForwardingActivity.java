@@ -5,10 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
@@ -16,12 +15,13 @@ import androidx.appcompat.app.AlertDialog;
 
 import org.thoughtcrime.securesms.BaseActionBarActivity;
 import org.thoughtcrime.securesms.R;
+import org.thoughtcrime.securesms.util.ViewUtil;
 
 import java.util.ArrayList;
 
 public class YggdrasilPortForwardingActivity extends BaseActionBarActivity {
 
-  private ArrayAdapter<String> adapter;
+  private LinearLayout listContainer;
   private TextView headerText;
   private final ArrayList<String> mappings = new ArrayList<>();
 
@@ -34,6 +34,8 @@ public class YggdrasilPortForwardingActivity extends BaseActionBarActivity {
     super.onCreate(bundle);
     setContentView(R.layout.yggdrasil_port_forwarding_activity);
 
+    ViewUtil.applyWindowInsets(findViewById(R.id.content_container), true, true, true, true);
+
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {
       actionBar.setTitle(R.string.yggdrasil_port_forwarding);
@@ -41,18 +43,8 @@ public class YggdrasilPortForwardingActivity extends BaseActionBarActivity {
     }
 
     headerText = findViewById(R.id.yggdrasil_pf_header);
-    ListView listView = findViewById(R.id.yggdrasil_pf_list);
+    listContainer = findViewById(R.id.yggdrasil_pf_list);
     Button addBtn = findViewById(R.id.yggdrasil_add_pf);
-
-    adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mappings);
-    listView.setAdapter(adapter);
-
-    listView.setOnItemLongClickListener(
-        (parent, view, position, id) -> {
-          String item = adapter.getItem(position);
-          if (item != null) showDeleteMappingDialog(item);
-          return true;
-        });
 
     addBtn.setOnClickListener(v -> showAddMappingDialog());
     loadMappings();
@@ -70,8 +62,25 @@ public class YggdrasilPortForwardingActivity extends BaseActionBarActivity {
   private void loadMappings() {
     mappings.clear();
     mappings.addAll(YggdrasilManager.getSavedMappings());
-    adapter.notifyDataSetChanged();
+
+    listContainer.removeAllViews();
+    for (String mapping : mappings) {
+      addMappingView(mapping);
+    }
     headerText.setText(getString(R.string.yggdrasil_pf_header, mappings.size()));
+  }
+
+  private void addMappingView(String mapping) {
+    TextView tv = new TextView(this);
+    tv.setText(mapping);
+    tv.setPadding(0, 12, 0, 12);
+    tv.setTextSize(16);
+    tv.setOnLongClickListener(
+        v -> {
+          showDeleteMappingDialog(mapping);
+          return true;
+        });
+    listContainer.addView(tv);
   }
 
   private void showAddMappingDialog() {
@@ -97,8 +106,7 @@ public class YggdrasilPortForwardingActivity extends BaseActionBarActivity {
                 YggdrasilManager.addLocalTCPMapping(localAddr, remoteAddr);
 
                 mappings.add(localAddr + " -> [" + remoteHost + "]:" + remotePort);
-                adapter.notifyDataSetChanged();
-                headerText.setText(getString(R.string.yggdrasil_pf_header, mappings.size()));
+                loadMappings();
               } catch (NumberFormatException e) {
                 // ignore invalid input
               }
@@ -120,8 +128,7 @@ public class YggdrasilPortForwardingActivity extends BaseActionBarActivity {
                 String remoteAddr = parts[1].trim();
                 YggdrasilManager.removeLocalTCPMapping(localAddr, remoteAddr);
                 mappings.remove(mapping);
-                adapter.notifyDataSetChanged();
-                headerText.setText(getString(R.string.yggdrasil_pf_header, mappings.size()));
+                loadMappings();
               } catch (Exception e) {
                 // ignore
               }
