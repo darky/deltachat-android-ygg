@@ -102,7 +102,7 @@ public class YggdrasilManager {
   }
 
   public static int getPeerCount() {
-    return getAllPeers().size();
+    return getActivePeerCount();
   }
 
   public static synchronized void init(Context context) {
@@ -164,11 +164,9 @@ public class YggdrasilManager {
 
   private static void addPeersFromPrefs(Context context) {
     for (PeerEntry entry : getAllPeers()) {
+      if (!entry.active) continue;
       try {
         instance.addPeer(entry.uri);
-        if (entry.active) {
-          instance.addLivePeer(entry.uri);
-        }
       } catch (Exception e) {
         Log.e(TAG, "Failed to add peer " + entry.uri, e);
       }
@@ -245,9 +243,6 @@ public class YggdrasilManager {
     try {
       instance.start("", "");
       running = true;
-      for (String peer : getActivePeers()) {
-        instance.addLivePeer(peer);
-      }
       restoreMappings();
       Log.i(TAG, "Yggdrasil started");
     } catch (Exception e) {
