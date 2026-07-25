@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -13,13 +15,11 @@ import android.widget.TextView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 
-import org.json.JSONArray;
 import org.thoughtcrime.securesms.BaseActionBarActivity;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.util.Util;
 import org.thoughtcrime.securesms.util.ViewUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class YggdrasilPeersActivity extends BaseActionBarActivity {
@@ -64,45 +64,47 @@ public class YggdrasilPeersActivity extends BaseActionBarActivity {
   private void loadPeers() {
     Util.runOnAnyBackgroundThread(
         () -> {
-          List<String> peers = getPeersList();
+          List<YggdrasilManager.PeerEntry> peers = YggdrasilManager.getAllPeers();
           Util.runOnMain(
               () -> {
                 listContainer.removeAllViews();
                 headerText.setText(getString(R.string.yggdrasil_peers_header, peers.size()));
-                for (String peer : peers) {
+                for (YggdrasilManager.PeerEntry peer : peers) {
                   addPeerView(peer);
                 }
               });
         });
   }
 
-  private void addPeerView(String peer) {
+  private void addPeerView(YggdrasilManager.PeerEntry peer) {
+    LinearLayout row = new LinearLayout(this);
+    row.setOrientation(LinearLayout.HORIZONTAL);
+    row.setPadding(0, 8, 0, 8);
+
+    CheckBox checkBox = new CheckBox(this);
+    checkBox.setChecked(peer.active);
+
     TextView tv = new TextView(this);
-    tv.setText(peer);
-    tv.setPadding(0, 12, 0, 12);
+    tv.setText(peer.uri);
     tv.setTextSize(16);
-    tv.setOnLongClickListener(
+    tv.setPadding(16, 0, 0, 0);
+    tv.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+
+    row.addView(checkBox);
+    row.addView(tv);
+
+    checkBox.setOnCheckedChangeListener(
+        (buttonView, isChecked) -> {
+          YggdrasilManager.setPeerActive(peer.uri, isChecked);
+        });
+
+    row.setOnLongClickListener(
         v -> {
-          showDeleteDialog(peer);
+          showDeleteDialog(peer.uri);
           return true;
         });
-    listContainer.addView(tv);
-  }
 
-  private List<String> getPeersList() {
-    List<String> result = new ArrayList<>();
-    try {
-      String json = YggdrasilManager.getConfiguredPeers();
-      if (json == null || json.equals("[]") || json.equals("null")) return result;
-      JSONArray arr = new JSONArray(json);
-      for (int i = 0; i < arr.length(); i++) {
-        String peer = arr.optString(i, null);
-        if (peer != null) result.add(peer);
-      }
-    } catch (Exception e) {
-      // ignore
-    }
-    return result;
+    listContainer.addView(row);
   }
 
   private void showAddDialog() {

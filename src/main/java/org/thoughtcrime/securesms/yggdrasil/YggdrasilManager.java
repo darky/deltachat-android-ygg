@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -34,6 +35,31 @@ public class YggdrasilManager {
   private static Context appContext;
 
   private static final CopyOnWriteArrayList<Runnable> statusListeners = new CopyOnWriteArrayList<>();
+
+  public static class PeerEntry {
+    public final String uri;
+    public boolean active;
+
+    public PeerEntry(String uri, boolean active) {
+      this.uri = uri;
+      this.active = active;
+    }
+
+    public static PeerEntry fromJson(JSONObject obj) {
+      return new PeerEntry(obj.optString("uri", ""), obj.optBoolean("active", false));
+    }
+
+    public JSONObject toJson() {
+      try {
+        JSONObject obj = new JSONObject();
+        obj.put("uri", uri);
+        obj.put("active", active);
+        return obj;
+      } catch (JSONException e) {
+        return new JSONObject();
+      }
+    }
+  }
 
   public static void addStatusListener(Runnable l) {
     statusListeners.add(l);
@@ -70,26 +96,13 @@ public class YggdrasilManager {
   }
 
   public static String getConfiguredPeers() {
-    try {
-      return instance != null ? instance.getPeers() : "[]";
-    } catch (Exception e) {
-      return "[]";
-    }
+    if (appContext == null) return "[]";
+    return appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        .getString(KEY_PEERS, "[]");
   }
 
   public static int getPeerCount() {
-    try {
-      if (instance == null) return 0;
-      String json = instance.getPeers();
-      if (json == null || json.equals("[]") || json.equals("null")) return 0;
-      int count = 0;
-      for (int i = 0; i < json.length(); i++) {
-        if (json.charAt(i) == '\"') count++;
-      }
-      return count / 2;
-    } catch (Exception e) {
-      return 0;
-    }
+    return getAllPeers().size();
   }
 
   public static synchronized void init(Context context) {
@@ -133,38 +146,93 @@ public class YggdrasilManager {
 
   private static void initDefaultPeers(Context context) {
     JSONArray arr = new JSONArray();
+    boolean first = true;
     for (String peer : DEFAULT_PEERS) {
-      arr.put(peer);
+      try {
+        JSONObject obj = new JSONObject();
+        obj.put("uri", peer);
+        obj.put("active", first);
+        arr.put(obj);
+        first = false;
+      } catch (JSONException e) {
+        Log.e(TAG, "Failed to create default peer entry", e);
+      }
     }
     SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     prefs.edit().putString(KEY_PEERS, arr.toString()).apply();
   }
 
   private static void addPeersFromPrefs(Context context) {
-    SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-    String peersJson = prefs.getString(KEY_PEERS, null);
-    if (peersJson == null) return;
-    try {
-      JSONArray arr = new JSONArray(peersJson);
-      for (int i = 0; i < arr.length(); i++) {
-        String peer = arr.optString(i, null);
-        if (peer != null && !peer.isEmpty()) {
-          instance.addPeer(peer);
+    for (PeerEntry entry : getAllPeers()) {
+      try {
+        instance.addPeer(entry.uri);
+        if (entry.active) {
+          instance.addLivePeer(entry.uri);
         }
+      } catch (Exception e) {
+        Log.e(TAG, "Failed to add peer " + entry.uri, e);
       }
-    } catch (Exception e) {
-      Log.e(TAG, "Failed to load peers from prefs", e);
     }
   }
 
-  private static void persistPeers() {
-    if (appContext == null) return;
+  public static List<PeerEntry> getAllPeers() {
+    List<PeerEntry> result = new ArrayList<>();
+    if (appContext == null) return result;
+    String json = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        .getString(KEY_PEERS, "[]");
+    if (json == null || json.equals("[]") || json.equals("null")) return result;
     try {
-      String json = instance.getPeers();
-      SharedPreferences prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-      prefs.edit().putString(KEY_PEERS, json).apply();
+      JSONArray arr = new JSONArray(json);
+      for (int i = 0; i < arr.length(); i++) {
+        JSONObject obj = arr.optJSONObject(i);
+        if (obj != null) {
+          result.add(PeerEntry.fromJson(obj));
+        }
+      }
     } catch (Exception e) {
-      Log.e(TAG, "Failed to persist peers", e);
+      Log.e(TAG, "Failed to parse peers", e);
+    }
+    return result;
+  }
+
+  public static List<String> getActivePeers() {
+    List<String> result = new ArrayList<>();
+    for (PeerEntry entry : getAllPeers()) {
+      if (entry.active) {
+        result.add(entry.uri);
+      }
+    }
+    return result;
+  }
+
+  public static void setPeerActive(String uri, boolean active) {
+    if (appContext == null) return;
+    SharedPreferences prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+    String json = prefs.getString(KEY_PEERS, "[]");
+    try {
+      JSONArray arr = new JSONArray(json);
+      for (int i = 0; i < arr.length(); i++) {
+        JSONObject obj = arr.optJSONObject(i);
+        if (obj != null && uri.equals(obj.optString("uri", ""))) {
+          obj.put("active", active);
+          break;
+        }
+      }
+      prefs.edit().putString(KEY_PEERS, arr.toString()).apply();
+      if (instance != null) {
+        if (active) {
+          instance.addPeer(uri);
+          if (running) {
+            instance.addLivePeer(uri);
+          }
+        } else {
+          if (running) {
+            instance.removeLivePeer(uri);
+          }
+        }
+      }
+    } catch (Exception e) {
+      Log.e(TAG, "Failed to set peer active " + uri, e);
     }
   }
 
@@ -177,6 +245,9 @@ public class YggdrasilManager {
     try {
       instance.start("", "");
       running = true;
+      for (String peer : getActivePeers()) {
+        instance.addLivePeer(peer);
+      }
       restoreMappings();
       Log.i(TAG, "Yggdrasil started");
     } catch (Exception e) {
@@ -201,24 +272,53 @@ public class YggdrasilManager {
   }
 
   public static void addPeer(String uri) {
+    if (appContext == null) return;
+    SharedPreferences prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+    String json = prefs.getString(KEY_PEERS, "[]");
     try {
-      instance.addPeer(uri);
-      if (running) {
-        instance.addLivePeer(uri);
+      JSONArray arr = new JSONArray(json);
+      for (int i = 0; i < arr.length(); i++) {
+        JSONObject obj = arr.optJSONObject(i);
+        if (obj != null && uri.equals(obj.optString("uri", ""))) {
+          return;
+        }
       }
-      persistPeers();
+      JSONObject entry = new JSONObject();
+      entry.put("uri", uri);
+      entry.put("active", false);
+      arr.put(entry);
+      prefs.edit().putString(KEY_PEERS, arr.toString()).apply();
+      if (instance != null) {
+        instance.addPeer(uri);
+      }
     } catch (Exception e) {
       Log.e(TAG, "Failed to add peer " + uri, e);
     }
   }
 
   public static void removePeer(String uri) {
+    if (appContext == null) return;
+    SharedPreferences prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+    String json = prefs.getString(KEY_PEERS, "[]");
     try {
-      instance.removePeer(uri);
-      if (running) {
-        instance.removeLivePeer(uri);
+      JSONArray arr = new JSONArray(json);
+      JSONArray updated = new JSONArray();
+      boolean wasActive = false;
+      for (int i = 0; i < arr.length(); i++) {
+        JSONObject obj = arr.optJSONObject(i);
+        if (obj != null && uri.equals(obj.optString("uri", ""))) {
+          wasActive = obj.optBoolean("active", false);
+        } else {
+          updated.put(obj);
+        }
       }
-      persistPeers();
+      prefs.edit().putString(KEY_PEERS, updated.toString()).apply();
+      if (instance != null) {
+        if (wasActive && running) {
+          instance.removeLivePeer(uri);
+        }
+        instance.removePeer(uri);
+      }
     } catch (Exception e) {
       Log.e(TAG, "Failed to remove peer " + uri, e);
     }
@@ -346,5 +446,22 @@ public class YggdrasilManager {
     if (running) {
       restoreMappings();
     }
+  }
+
+  public static String getActivePeer() {
+    List<PeerEntry> peers = getAllPeers();
+    for (PeerEntry entry : peers) {
+      if (entry.active) return entry.uri;
+    }
+    return "";
+  }
+
+  public static int getActivePeerCount() {
+    List<PeerEntry> peers = getAllPeers();
+    int count = 0;
+    for (PeerEntry entry : peers) {
+      if (entry.active) count++;
+    }
+    return count;
   }
 }
