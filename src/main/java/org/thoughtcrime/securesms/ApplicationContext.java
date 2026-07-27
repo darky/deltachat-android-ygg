@@ -29,9 +29,13 @@ import com.b44t.messenger.FFITransport;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 import org.thoughtcrime.securesms.calls.CallCoordinator;
+import org.thoughtcrime.securesms.calls.CallService;
 import org.thoughtcrime.securesms.connect.AccountManager;
-import org.thoughtcrime.securesms.connect.DcEventCenter;
 import org.thoughtcrime.securesms.connect.DcHelper;
+import org.thoughtcrime.securesms.geolocation.LocationStreamingService;
+import org.thoughtcrime.securesms.service.AudioPlaybackService;
+import org.thoughtcrime.securesms.service.FetchForegroundService;
+import org.thoughtcrime.securesms.connect.DcEventCenter;
 import org.thoughtcrime.securesms.connect.FetchWorker;
 import org.thoughtcrime.securesms.connect.ForegroundDetector;
 import org.thoughtcrime.securesms.connect.KeepAliveService;
@@ -400,6 +404,34 @@ public class ApplicationContext extends MultiDexApplication {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       EglUtils.release();
     }
+  }
+
+  public static void quitApp(@NonNull Context context) {
+    Log.i(TAG, "Shutting down app gracefully");
+
+    try {
+      dcAccounts.stopIo();
+    } catch (Exception e) {
+      Log.w(TAG, "Error stopping I/O", e);
+    }
+
+    try {
+      DcHelper.getRpc(context).stopSendingLocations();
+    } catch (Exception e) {
+      Log.w(TAG, "Error stopping location sharing", e);
+    }
+    context.stopService(new Intent(context, LocationStreamingService.class));
+    context.stopService(new Intent(context, KeepAliveService.class));
+    YggdrasilForegroundService.stopSelf(context);
+    FetchForegroundService.stop(context);
+    context.stopService(new Intent(context, AudioPlaybackService.class));
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      context.stopService(new Intent(context, CallService.class));
+    }
+
+    WorkManager.getInstance(context).cancelAllWork();
+
+    NotificationManagerCompat.from(context).cancelAll();
   }
 
   public JobManager getJobManager() {

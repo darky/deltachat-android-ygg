@@ -37,6 +37,7 @@
     <string name="attachment">Attachment</string>
     <string name="back">Back</string>
     <string name="close">Close</string>
+    <string name="menu_quit_app">Close app</string>
     <string name="close_window">Close Window</string>
     <string name="forward">Forward</string>
     <string name="create">Create</string>

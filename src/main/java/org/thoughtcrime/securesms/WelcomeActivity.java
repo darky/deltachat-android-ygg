@@ -10,6 +10,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.util.Linkify;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -152,13 +154,24 @@ public class WelcomeActivity extends BaseActionBarActivity
   }
 
   @Override
+  public boolean onCreateOptionsMenu(@NonNull Menu menu) {
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.welcome_menu, menu);
+    return true;
+  }
+
+  @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     super.onOptionsItemSelected(item);
 
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        getOnBackPressedDispatcher().onBackPressed();
-        return true;
+    int itemId = item.getItemId();
+    if (itemId == R.id.menu_quit_app) {
+      ApplicationContext.quitApp(this);
+      finishAffinity();
+      return true;
+    } else if (itemId == android.R.id.home) {
+      getOnBackPressedDispatcher().onBackPressed();
+      return true;
     }
 
     return false;
