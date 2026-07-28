@@ -1,5 +1,6 @@
 package org.thoughtcrime.securesms.bcrypt;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,11 +57,21 @@ public class BcryptActivity extends BaseActionBarActivity {
           if (rounds < 4) rounds = 4;
           if (rounds > 30) rounds = 30;
 
-          String hash = BCrypt.hashpw(password, BCrypt.gensalt(rounds));
+          int effectiveRounds = rounds;
 
-          resultLabel.setVisibility(View.VISIBLE);
-          resultText.setText(hash);
-          resultText.setVisibility(View.VISIBLE);
+          generateBtn.setEnabled(false);
+
+          AsyncTask.THREAD_POOL_EXECUTOR.execute(
+              () -> {
+                String hash = BCrypt.hashpw(password, BCrypt.gensalt(effectiveRounds));
+                runOnUiThread(
+                    () -> {
+                      generateBtn.setEnabled(true);
+                      resultLabel.setVisibility(View.VISIBLE);
+                      resultText.setText(hash);
+                      resultText.setVisibility(View.VISIBLE);
+                    });
+              });
         });
   }
 

@@ -29,7 +29,7 @@ android {
 
     defaultConfig {
         versionCode 754
-        versionName "2.57.0"
+        versionName "2.57.1"
 
         applicationId "com.b44t.messenger"
         multiDexEnabled true
