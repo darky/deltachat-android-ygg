@@ -543,7 +543,7 @@ public class DcHelper {
       if (lastError != null && !lastError.isEmpty()) {
         Log.w(TAG, "Opening account failed, trying to share error: " + lastError);
 
-        String subject = "Delta Chat failed to update";
+        String subject = "Delta Chat Ygg failed to update";
         String email = "delta@merlinux.eu";
 
         new AlertDialog.Builder(context)

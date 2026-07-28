@@ -880,7 +880,7 @@ public class NotificationCenter {
                   .setSmallIcon(R.drawable.icon_notification)
                   .setColor(context.getResources().getColor(R.color.delta_primary, null))
                   .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                  .setContentTitle("Delta Chat")
+                  .setContentTitle("Delta Chat Ygg")
                   .setContentText("New messages")
                   .setContentIntent(getOpenChatlistIntent(accountId));
           if (privacy.isDisplayContact() && !TextUtils.isEmpty(accountTag)) {

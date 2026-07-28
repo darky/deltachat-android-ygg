@@ -40,7 +40,7 @@ android {
         vectorDrawables.useSupportLibrary = true
 
         // base name of the generated apk
-        project.ext.set("archivesBaseName", "deltachat");
+        project.ext.set("archivesBaseName", "deltachat-ygg");
 
         buildConfigField "boolean", "DEV_BUILD", "false"
 
