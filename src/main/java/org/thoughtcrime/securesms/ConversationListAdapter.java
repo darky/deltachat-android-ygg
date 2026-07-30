@@ -28,8 +28,12 @@ import com.b44t.messenger.DcChatlist;
 import com.b44t.messenger.DcContext;
 import com.b44t.messenger.DcLot;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 import org.thoughtcrime.securesms.connect.DcHelper;
 import org.thoughtcrime.securesms.mms.GlideRequests;
+import org.thoughtcrime.securesms.search.TelegramChannelData;
+import org.thoughtcrime.securesms.util.Prefs;
 import org.thoughtcrime.securesms.util.ViewUtil;
 
 /**
@@ -43,10 +47,12 @@ class ConversationListAdapter
   private static final int MESSAGE_TYPE_SWITCH_ARCHIVE = 1;
   private static final int MESSAGE_TYPE_THREAD = 2;
   private static final int MESSAGE_TYPE_INBOX_ZERO = 3;
+  private static final int MESSAGE_TYPE_TELEGRAM_CHANNEL = 4;
 
   private final WeakReference<Context> context;
   private @NonNull DcContext dcContext;
   private @NonNull DcChatlist dcChatlist;
+  private @NonNull List<TelegramChannelData> telegramChannels;
   private final @NonNull GlideRequests glideRequests;
   private final @NonNull LayoutInflater inflater;
   private final @Nullable ItemClickListener clickListener;
@@ -63,12 +69,15 @@ class ConversationListAdapter
 
   @Override
   public int getItemCount() {
-    return dcChatlist.getCnt();
+    return telegramChannels.size() + dcChatlist.getCnt();
   }
 
   @Override
   public long getItemId(int i) {
-    return dcChatlist.getChatId(i);
+    if (i < telegramChannels.size()) {
+      return telegramChannels.get(i).getVirtualId();
+    }
+    return dcChatlist.getChatId(i - telegramChannels.size());
   }
 
   ConversationListAdapter(
@@ -80,6 +89,7 @@ class ConversationListAdapter
     this.glideRequests = glideRequests;
     this.dcContext = DcHelper.getContext(context);
     this.dcChatlist = new DcChatlist(0, 0);
+    this.telegramChannels = new ArrayList<>();
     this.inflater = LayoutInflater.from(context);
     this.clickListener = clickListener;
     setHasStableIds(true);
@@ -132,13 +142,20 @@ class ConversationListAdapter
       return;
     }
 
-    DcChat chat = dcContext.getChat(dcChatlist.getChatId(i));
-    DcLot summary = dcChatlist.getSummary(i, chat);
+    if (i < telegramChannels.size()) {
+      ((ConversationListItem) viewHolder.getItem())
+          .bind(telegramChannels.get(i), glideRequests, batchSet, batchMode);
+      return;
+    }
+
+    int chatIndex = i - telegramChannels.size();
+    DcChat chat = dcContext.getChat(dcChatlist.getChatId(chatIndex));
+    DcLot summary = dcChatlist.getSummary(chatIndex, chat);
     viewHolder
         .getItem()
         .bind(
             DcHelper.getThreadRecord(context, summary, chat),
-            dcChatlist.getMsgId(i),
+            dcChatlist.getMsgId(chatIndex),
             summary,
             glideRequests,
             batchSet,
@@ -147,7 +164,12 @@ class ConversationListAdapter
 
   @Override
   public int getItemViewType(int i) {
-    int chatId = dcChatlist.getChatId(i);
+    if (i < telegramChannels.size()) {
+      return MESSAGE_TYPE_TELEGRAM_CHANNEL;
+    }
+
+    int chatIndex = i - telegramChannels.size();
+    int chatId = dcChatlist.getChatId(chatIndex);
 
     if (chatId == DcChat.DC_CHAT_ID_ARCHIVED_LINK) {
       return MESSAGE_TYPE_SWITCH_ARCHIVE;
@@ -160,6 +182,9 @@ class ConversationListAdapter
 
   @Override
   public void selectAllThreads() {
+    for (int i = 0; i < telegramChannels.size(); i++) {
+      batchSet.add((long) telegramChannels.get(i).getVirtualId());
+    }
     for (int i = 0; i < dcChatlist.getCnt(); i++) {
       long threadId = dcChatlist.getChatId(i);
       if (threadId > DcChat.DC_CHAT_ID_LAST_SPECIAL) {
@@ -177,7 +202,7 @@ class ConversationListAdapter
     void onSwitchToArchive();
   }
 
-  void changeData(@Nullable DcChatlist chatlist) {
+  void changeData(@Nullable DcChatlist chatlist, boolean includeTelegramChannels) {
     Context context = this.context.get();
     if (context == null) {
       return;
@@ -188,6 +213,19 @@ class ConversationListAdapter
       dcChatlist = chatlist;
       dcContext = DcHelper.getContext(context);
     }
+    if (includeTelegramChannels) {
+      refreshTelegramChannels(context);
+    } else {
+      telegramChannels = new ArrayList<>();
+    }
     notifyDataSetChanged();
+  }
+
+  void refreshTelegramChannels(Context context) {
+    telegramChannels = new ArrayList<>();
+    List<String> channelNames = Prefs.getTelegramChannels(context);
+    for (int i = 0; i < channelNames.size(); i++) {
+      telegramChannels.add(new TelegramChannelData(channelNames.get(i), i));
+    }
   }
 }

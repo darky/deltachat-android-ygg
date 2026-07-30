@@ -49,6 +49,7 @@ import org.thoughtcrime.securesms.database.model.ThreadRecord;
 import org.thoughtcrime.securesms.mms.GlideRequests;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.search.QrInviteData;
+import org.thoughtcrime.securesms.search.TelegramChannelData;
 import org.thoughtcrime.securesms.util.DateUtils;
 import org.thoughtcrime.securesms.util.ThemeUtil;
 import org.thoughtcrime.securesms.util.Util;
@@ -250,6 +251,37 @@ public class ConversationListItem extends RelativeLayout
               .asDrawable(getContext(), ThemeUtil.getDummyContactColor(getContext())));
       avatar.setSeenRecently(false);
     }
+  }
+
+  public void bind(
+      @NonNull TelegramChannelData channelData,
+      @NonNull GlideRequests glideRequests,
+      @NonNull Set<Long> selectedThreads,
+      boolean batchMode) {
+    this.selectedThreads = selectedThreads;
+    this.chatId = channelData.getVirtualId();
+
+    this.fromView.setText(channelData.getDisplayTitle());
+    this.fromView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+    subjectView.setVisibility(VISIBLE);
+    this.subjectView.setText(channelData.getDisplaySubtitle());
+    this.subjectView.setTypeface(LIGHT_TYPEFACE);
+    this.subjectView.setTextColor(
+        ThemeUtil.getThemedColor(getContext(), R.attr.conversation_list_item_subject_color));
+
+    dateView.setText("");
+    dateView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+    archivedBadgeView.setVisibility(GONE);
+    requestBadgeView.setVisibility(GONE);
+    unreadIndicator.setVisibility(GONE);
+    deliveryStatusIndicator.setNone();
+
+    setBatchState(batchMode);
+
+    avatar.setImageDrawable(
+        new GeneratedContactPhoto("T")
+            .asDrawable(getContext(), ThemeUtil.getDummyContactColor(getContext())));
+    avatar.setSeenRecently(false);
   }
 
   @Override

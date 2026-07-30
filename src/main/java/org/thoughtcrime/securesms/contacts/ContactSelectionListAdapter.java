@@ -299,6 +299,8 @@ public class ContactSelectionListAdapter
       name = context.getString(R.string.new_channel);
     } else if (id == DcContact.DC_CONTACT_ID_QR_INVITE) {
       name = context.getString(R.string.menu_new_contact);
+    } else if (id == DcContact.DC_CONTACT_ID_ADD_TELEGRAM_CHANNEL) {
+      name = context.getString(R.string.add_telegram_channel);
     } else {
       dcContact = getContact(i);
       name = dcContact.getDisplayName();

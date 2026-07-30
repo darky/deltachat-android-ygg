@@ -74,7 +74,8 @@ public class ContactSelectionListItem extends LinearLayout implements RecipientM
         || specialId == DcContact.DC_CONTACT_ID_NEW_UNENCRYPTED_GROUP
         || specialId == DcContact.DC_CONTACT_ID_NEW_BROADCAST
         || specialId == DcContact.DC_CONTACT_ID_ADD_MEMBER
-        || specialId == DcContact.DC_CONTACT_ID_QR_INVITE) {
+        || specialId == DcContact.DC_CONTACT_ID_QR_INVITE
+        || specialId == DcContact.DC_CONTACT_ID_ADD_TELEGRAM_CHANNEL) {
       this.nameView.setTypeface(null, Typeface.BOLD);
     } else {
       this.recipient = new Recipient(getContext(), contact);
@@ -88,7 +89,7 @@ public class ContactSelectionListItem extends LinearLayout implements RecipientM
       this.avatar.setImageDrawable(
           new ResourceContactPhoto(R.drawable.ic_qr_code_24)
               .asDrawable(getContext(), ThemeUtil.getDummyContactColor(getContext())));
-    } else {
+    } else if (recipient != null) {
       this.avatar.setAvatar(glideRequests, recipient, false);
     }
     this.avatar.setSeenRecently(contact != null && contact.wasSeenRecently());

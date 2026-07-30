@@ -268,6 +268,11 @@
     <string name="new_classic_contact_explain">Manually added contacts can be used to text to classic email and are not guaranteed end-to-end encrypted.</string>
     <string name="menu_new_chat">New Chat</string>
     <string name="menu_new_group">New Group</string>
+    <string name="add_telegram_channel">Add Telegram Channel</string>
+    <string name="telegram_channel">Telegram Channel</string>
+    <string name="telegram_channel_name">Channel Name</string>
+    <string name="telegram_channel_name_hint">e.g. durov</string>
+    <string name="remove_telegram_channel">Remove Telegram Channel</string>
     <!-- "Chat" is a verb here, "Message to" would also fit. the string might be used in the "New Chat" screen above the contact list -->
     <string name="chat_with">Chat with…</string>
     <string name="clone_chat">Clone Chat</string>

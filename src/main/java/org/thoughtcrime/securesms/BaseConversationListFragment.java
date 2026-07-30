@@ -35,11 +35,14 @@ import com.b44t.messenger.DcContext;
 import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.thoughtcrime.securesms.components.registration.PulsingFloatingActionButton;
 import org.thoughtcrime.securesms.connect.DcHelper;
 import org.thoughtcrime.securesms.connect.DirectShareUtil;
 import org.thoughtcrime.securesms.recipients.Recipient;
+import org.thoughtcrime.securesms.search.TelegramChannelData;
+import org.thoughtcrime.securesms.util.Prefs;
 import org.thoughtcrime.securesms.util.SendRelayedMessageUtil;
 import org.thoughtcrime.securesms.util.Util;
 import org.thoughtcrime.securesms.util.task.SnackbarAsyncTask;
@@ -153,6 +156,7 @@ public abstract class BaseConversationListFragment extends Fragment implements A
     DcContext dcContext = DcHelper.getContext(requireActivity());
     final Set<Long> selectedChats = getListAdapter().getBatchSelections();
     for (long chatId : selectedChats) {
+      if (TelegramChannelData.isTelegramChannelId(chatId)) continue;
       DcChat dcChat = dcContext.getChat((int) chatId);
       if (dcChat.getVisibility() != DcChat.DC_CHAT_VISIBILITY_PINNED) {
         return true;
@@ -165,6 +169,7 @@ public abstract class BaseConversationListFragment extends Fragment implements A
     DcContext dcContext = DcHelper.getContext(requireActivity());
     final Set<Long> selectedChats = getListAdapter().getBatchSelections();
     for (long chatId : selectedChats) {
+      if (TelegramChannelData.isTelegramChannelId(chatId)) continue;
       DcChat dcChat = dcContext.getChat((int) chatId);
       if (!dcChat.isMuted()) {
         return true;
@@ -177,6 +182,7 @@ public abstract class BaseConversationListFragment extends Fragment implements A
     DcContext dcContext = DcHelper.getContext(requireActivity());
     final Set<Long> selectedChats = getListAdapter().getBatchSelections();
     for (long chatId : selectedChats) {
+      if (TelegramChannelData.isTelegramChannelId(chatId)) continue;
       if (dcContext.getFreshMsgCount((int) chatId) > 0) {
         return true;
       }
@@ -190,6 +196,7 @@ public abstract class BaseConversationListFragment extends Fragment implements A
         new HashSet<Long>(getListAdapter().getBatchSelections());
     boolean doPin = areSomeSelectedChatsUnpinned();
     for (long chatId : selectedConversations) {
+      if (TelegramChannelData.isTelegramChannelId(chatId)) continue;
       dcContext.setChatVisibility(
           (int) chatId,
           doPin ? DcChat.DC_CHAT_VISIBILITY_PINNED : DcChat.DC_CHAT_VISIBILITY_NORMAL);
@@ -209,6 +216,7 @@ public abstract class BaseConversationListFragment extends Fragment implements A
           getActivity(),
           duration -> {
             for (long chatId : selectedConversations) {
+              if (TelegramChannelData.isTelegramChannelId(chatId)) continue;
               dcContext.setChatMuteDuration((int) chatId, duration);
             }
 
@@ -220,6 +228,7 @@ public abstract class BaseConversationListFragment extends Fragment implements A
     } else {
       // unmute
       for (long chatId : selectedConversations) {
+        if (TelegramChannelData.isTelegramChannelId(chatId)) continue;
         dcContext.setChatMuteDuration((int) chatId, 0);
       }
 
@@ -235,6 +244,7 @@ public abstract class BaseConversationListFragment extends Fragment implements A
     final Set<Long> selectedConversations =
         new HashSet<Long>(getListAdapter().getBatchSelections());
     for (long chatId : selectedConversations) {
+      if (TelegramChannelData.isTelegramChannelId(chatId)) continue;
       dcContext.marknoticedChat((int) chatId);
     }
     if (actionMode != null) {
@@ -251,6 +261,7 @@ public abstract class BaseConversationListFragment extends Fragment implements A
     try {
       int accId = rpc.getSelectedAccountId();
       for (long chatId : selectedConversations) {
+        if (TelegramChannelData.isTelegramChannelId(chatId)) continue;
         rpc.markfreshChat(accId, (int) chatId);
       }
     } catch (RpcException e) {
@@ -294,6 +305,7 @@ public abstract class BaseConversationListFragment extends Fragment implements A
       @Override
       protected void executeAction(@Nullable Void parameter) {
         for (long chatId : selectedConversations) {
+          if (TelegramChannelData.isTelegramChannelId(chatId)) continue;
           dcContext.setChatVisibility(
               (int) chatId,
               archive ? DcChat.DC_CHAT_VISIBILITY_ARCHIVED : DcChat.DC_CHAT_VISIBILITY_NORMAL);
@@ -303,6 +315,7 @@ public abstract class BaseConversationListFragment extends Fragment implements A
       @Override
       protected void reverseAction(@Nullable Void parameter) {
         for (long threadId : selectedConversations) {
+          if (TelegramChannelData.isTelegramChannelId(threadId)) continue;
           dcContext.setChatVisibility(
               (int) threadId,
               archive ? DcChat.DC_CHAT_VISIBILITY_NORMAL : DcChat.DC_CHAT_VISIBILITY_ARCHIVED);
@@ -317,14 +330,37 @@ public abstract class BaseConversationListFragment extends Fragment implements A
     final DcContext dcContext = DcHelper.getContext(activity);
     final Set<Long> selectedChats = getListAdapter().getBatchSelections();
 
-    final int chatsCount = selectedChats.size();
+    final Set<Long> telegramChats = new HashSet<>();
+    final Set<Long> realChats = new HashSet<>();
+    final List<String> allChannels = Prefs.getTelegramChannels(activity);
+    for (long chatId : selectedChats) {
+      if (TelegramChannelData.isTelegramChannelId(chatId)) {
+        telegramChats.add(chatId);
+      } else {
+        realChats.add(chatId);
+      }
+    }
+
+    final int chatsCount = telegramChats.size() + realChats.size();
     final String alertText;
     if (chatsCount == 1) {
       long chatId = selectedChats.iterator().next();
-      alertText =
-          activity
-              .getResources()
-              .getString(R.string.ask_delete_named_chat, dcContext.getChat((int) chatId).getName());
+      if (TelegramChannelData.isTelegramChannelId(chatId)) {
+        int idx = TelegramChannelData.getChannelIndex(chatId);
+        alertText =
+            activity
+                .getResources()
+                .getString(
+                    R.string.ask_delete_named_chat,
+                    idx >= 0 && idx < allChannels.size() ? allChannels.get(idx) : "");
+      } else {
+        alertText =
+            activity
+                .getResources()
+                .getString(
+                    R.string.ask_delete_named_chat,
+                    dcContext.getChat((int) chatId).getName());
+      }
     } else {
       alertText =
           activity
@@ -333,19 +369,20 @@ public abstract class BaseConversationListFragment extends Fragment implements A
     }
 
     String alertButton = getString(R.string.delete_for_me);
-    for (long chatId : selectedChats) {
+    for (long chatId : realChats) {
       if (dcContext.getChat((int) chatId).shallLeaveBeforeDelete(dcContext)) {
         alertButton = getString(R.string.menu_leave_and_delete);
         break;
       }
     }
 
+    String finalAlertButton = alertButton;
     AlertDialog.Builder alert = new AlertDialog.Builder(activity);
     alert.setMessage(alertText);
     alert.setCancelable(true);
 
     alert.setPositiveButton(
-        alertButton,
+        finalAlertButton,
         (dialog, which) -> {
           if (!selectedChats.isEmpty()) {
             new AsyncTask<Void, Void, Void>() {
@@ -365,7 +402,13 @@ public abstract class BaseConversationListFragment extends Fragment implements A
               @Override
               protected Void doInBackground(Void... params) {
                 int accountId = dcContext.getAccountId();
-                for (long chatId : selectedChats) {
+                for (long chatId : telegramChats) {
+                  int idx = TelegramChannelData.getChannelIndex(chatId);
+                  if (idx >= 0 && idx < allChannels.size()) {
+                    Prefs.removeTelegramChannel(activity, allChannels.get(idx));
+                  }
+                }
+                for (long chatId : realChats) {
                   DcHelper.getNotificationCenter(requireContext())
                       .removeNotifications(accountId, (int) chatId);
                   if (dcContext.getChat((int) chatId).shallLeaveBeforeDelete(dcContext)) {
@@ -384,6 +427,10 @@ public abstract class BaseConversationListFragment extends Fragment implements A
                   actionMode.finish();
                   actionMode = null;
                 }
+                ConversationListAdapter adapter =
+                    (ConversationListAdapter) getListAdapter();
+                adapter.refreshTelegramChannels(activity);
+                adapter.notifyDataSetChanged();
               }
             }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
           }
@@ -404,7 +451,11 @@ public abstract class BaseConversationListFragment extends Fragment implements A
     final Activity activity = requireActivity();
     final DcContext dcContext = DcHelper.getContext(activity);
     final Set<Long> selectedChats = getListAdapter().getBatchSelections();
-    final DcChat chat = dcContext.getChat(selectedChats.iterator().next().intValue());
+    final long firstId = selectedChats.iterator().next();
+    if (TelegramChannelData.isTelegramChannelId(firstId)) {
+      return;
+    }
+    final DcChat chat = dcContext.getChat((int) firstId);
 
     Intent intent = new Intent(activity, ShareActivity.class);
     intent.setAction(Intent.ACTION_SEND);

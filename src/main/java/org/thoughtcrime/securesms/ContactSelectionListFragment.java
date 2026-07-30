@@ -348,6 +348,12 @@ public class ContactSelectionListFragment extends Fragment
           return;
         }
 
+        if (contactId == DcContact.DC_CONTACT_ID_ADD_TELEGRAM_CHANNEL) {
+          Intent intent = new Intent(getContext(), TelegramChannelActivity.class);
+          requireContext().startActivity(intent);
+          return;
+        }
+
         selectedContacts.add(contactId);
         deselectedContacts.remove(contactId);
         contact.setChecked(true);

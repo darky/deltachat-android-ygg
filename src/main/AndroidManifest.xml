@@ -252,6 +252,16 @@
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize" />
 
         <activity
+            android:name=".TelegramChannelActivity"
+            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize" />
+
+        <activity
+            android:name=".TelegramWebViewActivity"
+            android:theme="@style/TextSecure.LightTheme"
+            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize">
+        </activity>
+
+        <activity
             android:name=".NewConversationActivity"
             android:theme="@style/TextSecure.LightNoActionBar"
             android:windowSoftInputMode="stateHidden"

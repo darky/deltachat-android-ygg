@@ -62,6 +62,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import org.thoughtcrime.securesms.components.AvatarView;
 import org.thoughtcrime.securesms.components.SearchToolbar;
 import org.thoughtcrime.securesms.connect.AccountManager;
@@ -76,7 +77,9 @@ import org.thoughtcrime.securesms.qr.QrActivity;
 import org.thoughtcrime.securesms.qr.QrCodeHandler;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.search.SearchFragment;
+import org.thoughtcrime.securesms.search.TelegramChannelData;
 import org.thoughtcrime.securesms.util.DynamicNoActionBarTheme;
+import org.thoughtcrime.securesms.util.Prefs;
 import org.thoughtcrime.securesms.util.DynamicTheme;
 import org.thoughtcrime.securesms.util.Prefs;
 import org.thoughtcrime.securesms.util.SaveAttachmentTask;
@@ -627,6 +630,15 @@ public class ConversationListActivity extends PassphraseRequiredActionBarActivit
 
   public void openConversation(int chatId, int startingPosition) {
     searchToolbar.clearFocus();
+
+    if (TelegramChannelData.isTelegramChannelId(chatId)) {
+      int index = TelegramChannelData.getChannelIndex(chatId);
+      List<String> channels = Prefs.getTelegramChannels(this);
+      if (index >= 0 && index < channels.size()) {
+        TelegramWebViewActivity.open(this, channels.get(index));
+      }
+      return;
+    }
 
     final DcContext dcContext = DcHelper.getContext(this);
     int fwdAccId = getForwardedMessageAccountId(this);

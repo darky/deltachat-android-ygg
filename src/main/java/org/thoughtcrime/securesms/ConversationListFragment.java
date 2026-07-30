@@ -139,7 +139,7 @@ public class ConversationListFragment extends BaseConversationListFragment
 
     updateReminders();
 
-    if (requireActivity().getIntent().getIntExtra(RELOAD_LIST, 0) == 1 && !chatlistJustLoaded) {
+    if (!chatlistJustLoaded) {
       loadChatlist();
       reloadTimerInstantly = false;
     }
@@ -303,7 +303,8 @@ public class ConversationListFragment extends BaseConversationListFragment
             fab.stopPulse();
           }
 
-          ((ConversationListAdapter) list.getAdapter()).changeData(chatlist);
+          ((ConversationListAdapter) list.getAdapter())
+              .changeData(chatlist, !archive && !ShareUtil.isRelayingMessageContent(getActivity()));
 
           if (resetScrollPosition) {
             list.scrollToPosition(0);

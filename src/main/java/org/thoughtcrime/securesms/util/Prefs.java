@@ -357,4 +357,33 @@ public class Prefs {
     }
     return null;
   }
+
+  private static final String PREF_TELEGRAM_CHANNELS = "pref_telegram_channels";
+
+  public static List<String> getTelegramChannels(Context context) {
+    return new ArrayList<>(
+        getStringSetPreference(context, PREF_TELEGRAM_CHANNELS, new HashSet<>()));
+  }
+
+  public static void addTelegramChannel(Context context, String channelName) {
+    Set<String> channels = new HashSet<>(getTelegramChannels(context));
+    channels.add(channelName);
+    PreferenceManager.getDefaultSharedPreferences(context)
+        .edit()
+        .putStringSet(PREF_TELEGRAM_CHANNELS, channels)
+        .apply();
+  }
+
+  public static void removeTelegramChannel(Context context, String channelName) {
+    Set<String> channels = new HashSet<>(getTelegramChannels(context));
+    channels.remove(channelName);
+    PreferenceManager.getDefaultSharedPreferences(context)
+        .edit()
+        .putStringSet(PREF_TELEGRAM_CHANNELS, channels)
+        .apply();
+  }
+
+  public static boolean hasTelegramChannel(Context context, String channelName) {
+    return getTelegramChannels(context).contains(channelName);
+  }
 }
