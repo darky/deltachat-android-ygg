@@ -75,6 +75,13 @@ public class YggdrasilManager {
     }
   }
 
+  /** Initialize preference storage without creating or starting the native Yggstack instance. */
+  public static synchronized void initializeStorage(Context context) {
+    if (appContext == null && context != null) {
+      appContext = context.getApplicationContext();
+    }
+  }
+
   public static boolean isRunning() {
     return running;
   }
@@ -106,11 +113,11 @@ public class YggdrasilManager {
   }
 
   public static synchronized void init(Context context) {
+    initializeStorage(context);
     if (instance != null) {
       Log.w(TAG, "init: already initialized, skipping");
       return;
     }
-    appContext = context.getApplicationContext();
     instance = Mobile.newYggstack();
     instance.setLogLevel("info");
     instance.setLogCallback(message -> Log.i(TAG, message != null ? message : ""));

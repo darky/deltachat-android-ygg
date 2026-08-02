@@ -36,6 +36,8 @@ public class YggdrasilPeersActivity extends BaseActionBarActivity {
     super.onCreate(bundle);
     setContentView(R.layout.yggdrasil_peers_activity);
 
+    YggdrasilManager.initializeStorage(this);
+
     ViewUtil.applyWindowInsets(findViewById(R.id.content_container), true, true, true, true);
 
     ActionBar actionBar = getSupportActionBar();

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/content_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -58,6 +59,59 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/yggdrasil_peers" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/yggdrasil_remote_peers"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/yggdrasil_remote_peers_actions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/yggdrasil_fetch_remote_peers"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/yggdrasil_fetch_remote_peers" />
+
+            <Button
+                android:id="@+id/yggdrasil_check_remote_peers"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/yggdrasil_check_rtt"
+                android:enabled="false" />
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/yggdrasil_remote_peers_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:max="100"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/yggdrasil_remote_peers_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:text="@string/yggdrasil_remote_peers_initial" />
+
+        <LinearLayout
+            android:id="@+id/yggdrasil_remote_peers_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
 
         <Button
             android:id="@+id/yggdrasil_port_forwarding_btn"
