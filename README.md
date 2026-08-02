@@ -5,6 +5,10 @@ This is a **thin fork** of the [Delta Chat](https://delta.chat/) Android client 
 Features added:
 - Embedded Yggdrasil node (auto-starts on app boot)
 - Settings UI for connection status, peer management, and port forwarding
+- Remote peer discovery with RTT (latency) checking — fetch public Yggdrasil
+  peers and measure round-trip time, sorted by responsiveness
+- Telegram public channel viewer — add channels by handle (e.g. @durov)
+  and view them as virtual chats in the conversation list
 - Instant account login with Yggdrasil access from the overflow menu
 
 [<img src="https://delta.chat/assets/badges/get-it-on-gplay.png" alt="Get it on Google Play" height="48">](https://play.google.com/store/apps/details?id=chat.delta)
